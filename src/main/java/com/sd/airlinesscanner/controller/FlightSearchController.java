@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 @RequestMapping("/")
@@ -19,7 +19,7 @@ public class FlightSearchController {
     private final FlightScannerService flightScannerService;
 
     @PostMapping
-    public Flux<SearchResponse> search(@RequestBody  SearchRequest request){
+    public Mono<SearchResponse> search(@RequestBody  SearchRequest request){
         return flightScannerService.search(request);
     }
 

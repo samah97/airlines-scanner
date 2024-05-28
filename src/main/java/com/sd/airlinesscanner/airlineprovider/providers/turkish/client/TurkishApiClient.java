@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sd.airlinesscanner.airlineprovider.providers.turkish.client.request.TurkishSearchFlightRequest;
 import com.sd.airlinesscanner.airlineprovider.providers.turkish.client.response.TurkishSearchFlightResponse;
+import com.sd.airlinesscanner.airlineprovider.providers.turkish.client.response.TurkishSearchFlightResponseUtils;
 import com.sd.airlinesscanner.util.custom_naming_strategies.CapitalizeFirstLetterStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -35,16 +35,14 @@ public class TurkishApiClient {
     private WebClient initClient(){
         return WebClient.builder()
                 .baseUrl(BASE_URL)
-                .codecs(clientCodecConfigurer -> {
+                .codecs(clientCodecConfigurer ->
                     clientCodecConfigurer.defaultCodecs().jackson2JsonEncoder(
-                            new Jackson2JsonEncoder(objectMapper, MediaType.APPLICATION_JSON));
-//                    clientCodecConfigurer.defaultCodecs().jackson2JsonDecoder(
-//                            new Jackson2JsonDecoder(objectMapper, MediaType.APPLICATION_JSON));
-                })
-                .build();
+                            new Jackson2JsonEncoder(objectMapper, MediaType.APPLICATION_JSON))
+                ).build();
     }
 
     public Mono<TurkishSearchFlightResponse> searchFlights(TurkishSearchFlightRequest request){
+        log.info("Retrieving TURKISH flights");
         logRequestBody(request);
         return client.post()
                 .uri("/getAvailability")
@@ -57,6 +55,9 @@ public class TurkishApiClient {
                         return clientResponse.bodyToMono(TurkishSearchFlightResponse.class)
                                 .map(response -> {
                                     logRequestBody(response);
+                                    log.info("DONE Retrieving TURKISH flights, total = {}",
+                                            TurkishSearchFlightResponseUtils.extractFlightsNbr(response)
+                                    );
                                     return response;
                                 });
                     } else if (clientResponse.statusCode().is4xxClientError()) {
@@ -76,7 +77,7 @@ public class TurkishApiClient {
         try {
             log.info("Request/Response Info: {}", objectMapper.writeValueAsString(object));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
         }
     }
 
