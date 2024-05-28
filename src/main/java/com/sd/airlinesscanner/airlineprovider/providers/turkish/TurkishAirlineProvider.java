@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-
 @RequiredArgsConstructor
 @Service("turkish")
 public class TurkishAirlineProvider implements AirlineProvider {

@@ -26,7 +26,7 @@ public class FlightScannerService {
     private final ApplicationContext applicationContext;
 
     public Mono<SearchResponse> search(final SearchRequest searchRequest){
-        List<String> providers = airlineProviderConfig.getProvidersList();
+        List<String> providers = airlineProviderConfig.getAirlineProviders();
         return Flux.fromIterable(providers)
                 .flatMap(provider-> Mono.just(provider)
                         .subscribeOn(createThreadPoolScheduler(providers.size())))
